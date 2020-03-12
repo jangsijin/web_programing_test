@@ -1,0 +1,68 @@
+<html>
+<head>
+    <style>
+        .background
+        {
+            background: "Cheeze.jpg";
+        }
+    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+    <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        $(document).ready(function () {
+            function changeIcon(target, from, to) {
+              alert(from +  to);
+                $(target).removeClass(from).addClass(to);
+            }
+
+            function changeCount(index, count) {
+                $('li[data-index=' + index + '] .ui-li-count').html(count);
+            }
+            var socket = io.connect();
+
+            socket.on('count', function (data) {
+                changeCount(data.index, data.count);
+            });
+            $('.product > a[data-icon]').click(function () {
+                if ($(this).attr('toggle') != 'off') {
+                    var index = $(this).attr('data-index');
+
+                    socket.emit('cart', Number(index));
+
+                    $(this).attr('toggle', 'off');
+                } 
+            });
+        });
+    </script>
+</head>
+<body>
+    <div data-role="page">
+        <div data-role="header">
+            <h1>Music List</h1>
+        </div>
+        <div data-role="content">
+            <ul id="listview" data-role="listview" data-inset="true"
+                data-filter="true">
+                <li data-role="list-divider">products</li>
+                <% products.forEach(function (item, index) { %>
+                <li class="product" data-index="<%= item.index %>">
+                    <a href="#">
+                        <img src="<%= item.image%>" />
+                        <h3><%= item.name %></h3>
+                        <p><%= item.price %></p>
+                        <embed src="<%= item.name%>.mp3" autostart=true></embed>
+                    </a>
+                    <a href="#" data-icon="heart" data-index="<%= item.index %>"></a>
+                </li>
+                <% }); %>
+            </ul>
+            <tr>
+                <td style="background-image: Cheeze.jpg"></td>
+            </tr>
+        </div>
+    </div>
+</body>
+</html>
